@@ -1,9 +1,9 @@
 <?php
 //appInc.php头必须定义如下内容
 #产品引用时必须定义，不定义不可使用
-define( "SYSLOG_PRODUCT", "mweibo" );
+define( "SYSLOG_PRODUCT", "sina" );
 //非必定义
-define( "SYSLOG_MODULE", "BBS" );
+define( "SYSLOG_MODULE", "mweibo" );
 
 //调试,file_put_contents输出，请千万小心
 define( "SYSLOG_DEBUG_FLAG", false );
