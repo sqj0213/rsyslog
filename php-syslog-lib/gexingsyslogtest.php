@@ -11,7 +11,7 @@ define( "SYSLOG_DEBUG_FILE_PATH", "/var/log/phpSyslogDebug.log" );
 
 
 
-require_once( "./syslog.php" );
+require_once( "./selfSyslog.php" );
 
 //单条日志调用形式，如果同一文件有多处写日志请求，请不要使用此函数
 //文件名与行号:日志无file与line键值，系统自动补全，补全方式为doLog函数被调用时所在的文件名与行号。建议记日志处加file与line两键
@@ -22,7 +22,7 @@ $data = array(
 			'summary'=>"update data",
 			'detail'=>"update data info:update data succes"
 			);
-GEXINGSyslog::doLog( $level, $data );
+selfSyslog::doLog( $level, $data );
 
 //module键:自定义写日志方式
 $level = LOG_INFO_STORE;
@@ -31,7 +31,7 @@ $data = array(
 			'summary'=>"update data",
 			'detail'=>"update data info:update data succes"
 			);
-GEXINGSyslog::doLog( $level, $data );
+selfSyslog::doLog( $level, $data );
 
 //文件名与行号:应用自己写的方式
 $level = LOG_INFO_STORE;
@@ -42,7 +42,7 @@ $data = array(
 			'file'=>__FILE__,
 			'line'=>__LINE__
 			);
-GEXINGSyslog::doLog( $level, $data );
+selfSyslog::doLog( $level, $data );
 
 
 $level = LOG_INFO_STORE;
@@ -61,5 +61,5 @@ $data = array(
 					'detail'=>"update data1 failed:connect db error!"
 					)
 			);
-GEXINGSyslog::doLog( $level, $data );
+selfSyslog::doLog( $level, $data );
 ?>
