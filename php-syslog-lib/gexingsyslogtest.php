@@ -1,17 +1,17 @@
 <?php
 //appInc.php头必须定义如下内容
 #产品引用时必须定义，不定义不可使用
-define( "GEXING_SYSLOG_PRODUCT", "gexingweb" );
+define( "SYSLOG_PRODUCT", "mweibo" );
 //非必定义
-define( "GEXING_SYSLOG_MODULE", "BBS" );
+define( "SYSLOG_MODULE", "BBS" );
 
 //调试,file_put_contents输出，请千万小心
-define( "GEXING_SYSLOG_DEBUG_FLAG", false );
-define( "GEXING_SYSLOG_DEBUG_FILE_PATH", "/var/log/GEXINGDebug.log" );
+define( "SYSLOG_DEBUG_FLAG", false );
+define( "SYSLOG_DEBUG_FILE_PATH", "/var/log/phpSyslogDebug.log" );
 
 
 
-require_once( "./GEXINGSyslog.php" );
+require_once( "./syslog.php" );
 
 //单条日志调用形式，如果同一文件有多处写日志请求，请不要使用此函数
 //文件名与行号:日志无file与line键值，系统自动补全，补全方式为doLog函数被调用时所在的文件名与行号。建议记日志处加file与line两键
