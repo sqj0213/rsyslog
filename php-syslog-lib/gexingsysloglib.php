@@ -19,37 +19,37 @@ define( "LOG_ERROR_TEMP", 6 );
 
 
 
-define( "GEXING_MAX_LOG_LEVEL", 6 );
-define( "GEXING_MIN_LOG_LEVEL", 0 );
-define( "GEXING_SYSLOG_MULTI_LOG", 2 );
+define( "MAX_LOG_LEVEL", 6 );
+define( "MIN_LOG_LEVEL", 0 );
+define( "SYSLOG_MULTI_LOG", 2 );
 
 //单节点最大msg为4096,系统定义为5*1024
-define( "GEXING_SYSLOG_MAX_DETAIL_SIZE", 4096 );
+define( "SYSLOG_MAX_DETAIL_SIZE", 4096 );
 //最大允许一次上传1000个msg
-define( "GEXING_SYSLOG_MAX_DATA_ROW", 1000 );
+define( "SYSLOG_MAX_DATA_ROW", 1000 );
 
-define( "GEXING_SYSLOG_OPTION", LOG_PID );
-define( "GEXING_SYSLOG_DELIMITER", "|" );
-define("GEXING_DETAIL_REPLACEMENT",			'&#30;');	# 含有分割符则替换成 &#30; 控制字符record separator的HTML Entity Code，原始代码中用的是 $#30;
+define( "SYSLOG_OPTION", LOG_PID );
+define( "SYSLOG_DELIMITER", "|" );
+define("DETAIL_REPLACEMENT",			'&#30;');	# 含有分割符则替换成 &#30; 控制字符record separator的HTML Entity Code，原始代码中用的是 $#30;
 
 //错误信息代码
-define( "GEXING_SYSLOG_FORMAT_VALID", 0 );
-define( "GEXING_SYSLOG_PRODUCT_NOT_DEFINED", 1 );
-define( "GEXING_SYSLOG_FORMAT_INVALID", 2 );
-define( "GEXING_SYSLOG_LEVEL_INVALID", 3 );
-define( "GEXING_SYSLOG_MSGSIZE_INVALID", 4 );
-define( "GEXING_SYSLOG_DATAROW_INVALID", 5 );
+define( "SYSLOG_FORMAT_VALID", 0 );
+define( "SYSLOG_PRODUCT_NOT_DEFINED", 1 );
+define( "SYSLOG_FORMAT_INVALID", 2 );
+define( "SYSLOG_LEVEL_INVALID", 3 );
+define( "SYSLOG_MSGSIZE_INVALID", 4 );
+define( "SYSLOG_DATAROW_INVALID", 5 );
 
 
-//define( "GEXING_SYSLOG_DEBUG_FLAG", false );
-//define( "GEXING_SYSLOG_DEBUG_FILE_PATH", "/var/log/GEXINGDebug.log" );
+//define( "SYSLOG_DEBUG_FLAG", false );
+//define( "SYSLOG_DEBUG_FILE_PATH", "/var/log/phpSyslogDebug.log" );
 
 
 
-class GEXINGSyslog
+class selfSyslog
 {
 
-	static $productList = array( 'gexingweb', 'runlog' );
+	static $productList = array( 'mweibo', 'runlog-mweibo' );
 	static $product = '';
 	static $module = '';
 	//debug可以通过msg的fiter过滤关键字来实现相应的邮件提醒与报警
@@ -111,29 +111,29 @@ class GEXINGSyslog
 
 	static protected function checkData( $level, $data=array() )
 	{
-		if ( $level > GEXING_MAX_LOG_LEVEL || $level < GEXING_MIN_LOG_LEVEL )
-			return GEXING_SYSLOG_LEVEL_INVALID;//单条日志，日志级别错误
+		if ( $level > MAX_LOG_LEVEL || $level < MIN_LOG_LEVEL )
+			return SYSLOG_LEVEL_INVALID;//单条日志，日志级别错误
         //若为单条日志
 		if ( isset( $data[ 'detail' ] ) && isset( $data[ 'summary' ] ) && ( count( $data ) <= count( self::$fieldList ) ) )
 		{
 
 			$diffArr = array_diff( self::$fieldList, array_keys( $data ) );
 			if ( !Empty( $diffArr ) && $diffArr != array( '4'=>'module' ) )
-				return GEXING_SYSLOG_FORMAT_INVALID;
+				return SYSLOG_FORMAT_INVALID;
 
 
 			if ( "" === $data[ 'detail' ]  )
-				return GEXING_SYSLOG_MSGSIZE_INVALID;//msg不可以为空
+				return SYSLOG_MSGSIZE_INVALID;//msg不可以为空
 
-			if ( strlen( $data[ 'detail' ] ) > GEXING_SYSLOG_MAX_DETAIL_SIZE )
-				return GEXING_SYSLOG_MSGSIZE_INVALID;//msg过长
+			if ( strlen( $data[ 'detail' ] ) > SYSLOG_MAX_DETAIL_SIZE )
+				return SYSLOG_MSGSIZE_INVALID;//msg过长
 
-			return GEXING_SYSLOG_FORMAT_VALID;//单条日志形式，日志有效
+			return SYSLOG_FORMAT_VALID;//单条日志形式，日志有效
 		}
 		//若为多条则，且超过1000行，则这回日志错误
-		if ( count( $data ) > GEXING_SYSLOG_MAX_DATA_ROW )
-			return GEXING_SYSLOG_DATAROW_INVALID;//日志格式错误
-		return GEXING_SYSLOG_MULTI_LOG;//多条日志形式
+		if ( count( $data ) > SYSLOG_MAX_DATA_ROW )
+			return SYSLOG_DATAROW_INVALID;//日志格式错误
+		return SYSLOG_MULTI_LOG;//多条日志形式
 
 	}
 	static protected function buildMsg( $data=array() )
@@ -152,10 +152,10 @@ class GEXINGSyslog
 		}
 
 		//替换detail里的分割符
-		$data[ 'detail' ] = str_replace( GEXING_SYSLOG_DELIMITER, GEXING_DETAIL_REPLACEMENT, $data[ 'detail' ] );
+		$data[ 'detail' ] = str_replace( SYSLOG_DELIMITER, DETAIL_REPLACEMENT, $data[ 'detail' ] );
 
 		//拼接msg
-		$msg = self::$module.GEXING_SYSLOG_DELIMITER.$data[ 'summary' ].GEXING_SYSLOG_DELIMITER.$data[ 'detail' ].GEXING_SYSLOG_DELIMITER.$data['file' ].GEXING_SYSLOG_DELIMITER.$data[ 'line' ] ;
+		$msg = self::$module.SYSLOG_DELIMITER.$data[ 'summary' ].SYSLOG_DELIMITER.$data[ 'detail' ].SYSLOG_DELIMITER.$data['file' ].SYSLOG_DELIMITER.$data[ 'line' ] ;
 		return $msg;
 
 	}
@@ -172,25 +172,25 @@ class GEXINGSyslog
 			}
 			else
 			{
-				if ( defined( "GEXING_SYSLOG_DEBUG_FLAG" ) &&  GEXING_SYSLOG_DEBUG_FLAG )
-					self::_GEXINGDebug( GEXING_SYSLOG_PRODUCT_NOT_DEFINED, $data );
-				return GEXING_SYSLOG_PRODUCT_NOT_DEFINED;			
+				if ( defined( "SYSLOG_DEBUG_FLAG" ) &&  SYSLOG_DEBUG_FLAG )
+					self::_selfDebug( SYSLOG_PRODUCT_NOT_DEFINED, $data );
+				return SYSLOG_PRODUCT_NOT_DEFINED;			
 			}			
 		}
 		else
 		{
-			if ( !defined( 'GEXING_SYSLOG_PRODUCT' ) )
+			if ( !defined( 'SYSLOG_PRODUCT' ) )
 			{
-				if ( defined( "GEXING_SYSLOG_DEBUG_FLAG" ) &&  GEXING_SYSLOG_DEBUG_FLAG )
-					self::_GEXINGDebug( GEXING_SYSLOG_PRODUCT_NOT_DEFINED, $data );
-				return GEXING_SYSLOG_PRODUCT_NOT_DEFINED;
+				if ( defined( "SYSLOG_DEBUG_FLAG" ) &&  SYSLOG_DEBUG_FLAG )
+					self::_selfDebug( SYSLOG_PRODUCT_NOT_DEFINED, $data );
+				return SYSLOG_PRODUCT_NOT_DEFINED;
 			}
 
-			self::$product = GEXING_SYSLOG_PRODUCT;
+			self::$product = SYSLOG_PRODUCT;
 
-			if ( defined( 'GEXING_SYSLOG_MODULE' ) && "" != GEXING_SYSLOG_MODULE )
+			if ( defined( 'SYSLOG_MODULE' ) && "" != SYSLOG_MODULE )
 			{
-				self::$module = GEXING_SYSLOG_MODULE;
+				self::$module = SYSLOG_MODULE;
 			}
 			else
 			{
@@ -210,24 +210,24 @@ class GEXINGSyslog
 		$checkDataResult = self::checkData( $level, $data );
 
 		//单条日志形式写syslog
-		if ( $checkDataResult === GEXING_SYSLOG_FORMAT_VALID )
+		if ( $checkDataResult === SYSLOG_FORMAT_VALID )
 		{
-			openlog( self::$product, GEXING_SYSLOG_OPTION, self::$facility[ $level ] );
+			openlog( self::$product, SYSLOG_OPTION, self::$facility[ $level ] );
 			syslog( self::$priority[ $level ], self::buildMsg( $data ) );
 			closelog();
 		}
-		else if ( $checkDataResult != GEXING_SYSLOG_MULTI_LOG )
+		else if ( $checkDataResult != SYSLOG_MULTI_LOG )
 		{
-			if ( defined( "GEXING_SYSLOG_DEBUG_FLAG" ) &&  GEXING_SYSLOG_DEBUG_FLAG )
-				self::_GEXINGDebug( $checkDataResult, $data );
+			if ( defined( "SYSLOG_DEBUG_FLAG" ) &&  SYSLOG_DEBUG_FLAG )
+				self::_selfDebug( $checkDataResult, $data );
 			return $checkDataResult;
 
 		}
 		//若为多条日志形式
-		if ( $checkDataResult === GEXING_SYSLOG_MULTI_LOG )
+		if ( $checkDataResult === SYSLOG_MULTI_LOG )
 		{
 			$rowCount = count( $data );
-			openlog( self::$product, GEXING_SYSLOG_OPTION, self::$facility[ $level ] );
+			openlog( self::$product, SYSLOG_OPTION, self::$facility[ $level ] );
 			//所有日志行号相同
 			$calledInfo =  self::_get_called_loc();
 			for ( $i = 0;  $i < $rowCount; $i++ )
@@ -240,15 +240,15 @@ class GEXINGSyslog
 						list($rowData[ 'file' ], $rowData[ 'line' ] ) = $calledInfo;
 					}
 					$checkDataResult = self::checkData( $level, $rowData );
-					if (  $checkDataResult === GEXING_SYSLOG_FORMAT_VALID )//日志为单条日志，且级别有效则写入，否则中断
+					if (  $checkDataResult === SYSLOG_FORMAT_VALID )//日志为单条日志，且级别有效则写入，否则中断
 					{
 						syslog( self::$priority[ $level ], self::buildMsg( $rowData ) );
 					}
 					else
 					{
 						closelog();
-						if ( defined( "GEXING_SYSLOG_DEBUG_FLAG" ) &&  GEXING_SYSLOG_DEBUG_FLAG )
-							self::_GEXINGDebug( $checkDataResult, $data );
+						if ( defined( "SYSLOG_DEBUG_FLAG" ) &&  SYSLOG_DEBUG_FLAG )
+							self::_selfDebug( $checkDataResult, $data );
 
 						return $checkDataResult;
 					}
@@ -256,33 +256,29 @@ class GEXINGSyslog
 				else
 				{
 					closelog();
-					if ( defined( "GEXING_SYSLOG_DEBUG_FLAG" ) &&  GEXING_SYSLOG_DEBUG_FLAG )
-						self::_GEXINGDebug( GEXING_SYSLOG_FORMAT_INVALID, $data );
-					return GEXING_SYSLOG_FORMAT_INVALID;
+					if ( defined( "SYSLOG_DEBUG_FLAG" ) &&  SYSLOG_DEBUG_FLAG )
+						self::_selfDebug( SYSLOG_FORMAT_INVALID, $data );
+					return SYSLOG_FORMAT_INVALID;
 				}
 			}
 			closelog();
 		}
-		if ( defined( "GEXING_SYSLOG_DEBUG_FLAG" ) &&  GEXING_SYSLOG_DEBUG_FLAG )
-			self::_GEXINGDebug( $checkDataResult, $data );
+		if ( defined( "SYSLOG_DEBUG_FLAG" ) &&  SYSLOG_DEBUG_FLAG )
+			self::_selfDebug( $checkDataResult, $data );
 
 	}
 
-	static protected function  _GEXINGDebug( $retCode=0, $data=array() )
+	static protected function  _selfDebug( $retCode=0, $data=array() )
 	{
 		$runMsg = array(
-						GEXING_SYSLOG_FORMAT_VALID=>'log format is valid!',
-						GEXING_SYSLOG_PRODUCT_NOT_DEFINED=>'Macro PRODUCT is not defined!',
-						GEXING_SYSLOG_FORMAT_INVALID=>'log format is invalid!',
-						GEXING_SYSLOG_LEVEL_INVALID=>'log level is invalid!',
-						GEXING_SYSLOG_MSGSIZE_INVALID=>'log detail field size >'.GEXING_SYSLOG_MAX_DETAIL_SIZE.'!' ,
-						GEXING_SYSLOG_DATAROW_INVALID=>'muti log row data >'.GEXING_SYSLOG_MAX_DATA_ROW.'!'
+						SYSLOG_FORMAT_VALID=>'log format is valid!',
+						SYSLOG_PRODUCT_NOT_DEFINED=>'Macro PRODUCT is not defined!',
+						SYSLOG_FORMAT_INVALID=>'log format is invalid!',
+						SYSLOG_LEVEL_INVALID=>'log level is invalid!',
+						SYSLOG_MSGSIZE_INVALID=>'log detail field size >'.SYSLOG_MAX_DETAIL_SIZE.'!' ,
+						SYSLOG_DATAROW_INVALID=>'muti log row data >'.SYSLOG_MAX_DATA_ROW.'!'
 						);
-		file_put_contents( GEXING_SYSLOG_DEBUG_FILE_PATH, 'runMsg:'.$runMsg[ $retCode ].'\tdata:'.print_r( $data, true ), FILE_APPEND );
-	}
-}
-?>
-ING_SYSLOG_DEBUG_FILE_PATH, 'runMsg:'.$runMsg[ $retCode ].'\tdata:'.print_r( $data, true ), FILE_APPEND );
+		file_put_contents( SYSLOG_DEBUG_FILE_PATH, 'runMsg:'.$runMsg[ $retCode ].'\tdata:'.print_r( $data, true ), FILE_APPEND );
 	}
 }
 ?>
